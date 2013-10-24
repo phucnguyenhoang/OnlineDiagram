@@ -100,7 +100,7 @@ Cells.prototype._title = function() {
     var txt = new Kinetic.Text({
         x: self.x + parseInt(self.x/2),
         y: self.y + 7,
-        text: 'AttributeName',
+        text: 'Entity name',
         fontSize: 17,
         align: 'center',
         fontStyle: 'bold',
@@ -135,6 +135,17 @@ Cells.prototype.setText = function(txt) {
  * 
  * @returns undefined
  */
+Cells.prototype.drawTitle = function() {
+    this._rect();
+    this._title();
+    main.layer.add(this.rect);
+    main.layer.add(this.title);    
+};
+
+/*
+ * 
+ * @returns undefined
+ */
 Cells.prototype._draw = function() {
     this._rect();
     this._key();
@@ -142,8 +153,6 @@ Cells.prototype._draw = function() {
     main.layer.add(this.rect);
     main.layer.add(this.key);
     main.layer.add(this.text);
-    var layer = main.layer;
-    main.stage.add(layer);
 };
 
 /*
@@ -155,5 +164,27 @@ Cells.prototype._draw = function() {
  * 
  */
 Cells.prototype.init = function() {
+    var layer = main.layer;
+    main.stage.add(layer);
     this._draw();
+};
+
+
+/*****************************************************************************************************************************/
+/*****************************************************************************************************************************/
+Entity = function(x, y) {
+    this.x = x;
+    this.y = y;
+    this.title = null;
+};
+Entity.prototype.drawTitle = function() {
+    var objTitle = new Cells(this.x, this.y);
+    objTitle.drawTitle();
+    this.title = objTitle;
+    this.title.setFill('#7195A3');
+};
+Entity.prototype.init = function() {
+    this.drawTitle();
+    var layer = main.layer;
+    main.stage.add(layer);
 };
