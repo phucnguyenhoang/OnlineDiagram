@@ -1,0 +1,36 @@
+<!DOCTYPE>
+<html>
+    <head>
+        <title>raphael</title>
+        <link rel="stylesheet" href="css/layout.css" type="text/css">
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript" src="js/kinetic-v4.7.2.min.js"></script>
+        <script type="text/javascript">
+            $(function(){
+                var stage = new Kinetic.Stage({
+                    container: 'mainPanel',
+                    width: 1200,
+                    height: 700
+                });
+                var layer = new Kinetic.Layer();
+                var path = new Kinetic.Path({
+                    x: 50,
+                    y: 50,
+                    //data: 'M12.582,9.551C3.251,16.237,0.921,29.021,7.08,38.564l-2.36,1.689l4.893,2.262l4.893,2.262l-0.568-5.36l-0.567-5.359l-2.365,1.694c-4.657-7.375-2.83-17.185,4.352-22.33c7.451-5.338,17.817-3.625,23.156,3.824c5.337,7.449,3.625,17.813-3.821,23.152l2.857,3.988c9.617-6.893,11.827-20.277,4.935-29.896C35.591,4.87,22.204,2.658,12.582,9.551z',
+                    data: 'M20,0C20,-25 -20,-25 -20,0C-20,5 -20,8 -10,15L-10,60L0,65L7,58L7,55L5,53L5,52L6,50L4,47L4,45L6,40L6,36L5,33L5,30L4,28L4,23C11,23 8,15 10,14C20,8 19,6 20,0z',
+                    fill: 'yellow',
+                    scale: 2
+                });
+
+                // add the shape to the layer
+                layer.add(path);
+
+                // add the layer to the stage
+                stage.add(layer);
+            });
+        </script>
+    </head>
+    <body>
+        <div id="mainPanel"></div>
+    </body>
+</html>

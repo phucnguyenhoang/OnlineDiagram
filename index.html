@@ -4,14 +4,14 @@
         <title>raphael</title>
         <link rel="stylesheet" href="css/layout.css" type="text/css">
         <script type="text/javascript" src="js/jquery.js"></script>
-        <script type="text/javascript" src="js/raphael.js"></script>
-        <script type="text/javascript" src="js/default.js"></script>
-        <script type="text/javascript" src="js/core_object.js"></script>
+        <script type="text/javascript" src="js/kinetic-v4.7.2.min.js"></script>
+        <script type="text/javascript" defer="defer" src="js/core/config.js"></script>
+        <script type="text/javascript" defer="defer" src="js/core/core.js"></script>
         <script type="text/javascript">
             $(function(){
-                var R = Raphael('mainPanel', 1000, 600);
-                var obj = new Table(R, 300, 50);
+                var obj = new Cells(100, 50);
                 obj.init();
+                //obj.setFill('red');
             });
         </script>
     </head>
