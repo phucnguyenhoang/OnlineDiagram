@@ -10,14 +10,14 @@ console.log(main);
 
 //create Cells object
 Cells = function(x, y) {   
-    this.x = x;
-    this.y = y;
-    this.w = 150;
-    this.h = 30;
-    this.fill = '#D4E7ED';
-    this.color = '#47423F';
-    this.text = 'Attribute name';
-    this.type = 'cell';
+    this.X = x;
+    this.Y = y;
+    this.W = 150;
+    this.H = 30;
+    this.FILL = '#D4E7ED';
+    this.COLOR = '#47423F';
+	this.TITLE_COLOR = '#FFFFFF';
+	this.TITLE_FILL = '#7195A3';
     this.rect = null;
     this.text = null;
     this.key = null;
@@ -32,16 +32,27 @@ Cells = function(x, y) {
  * @Action: draw cell into layer
  * 
  */
-Cells.prototype._rect = function() {
+Cells.prototype._rect = function(type) {
     var self = this;
-    var rect = new Kinetic.Rect({
-        x: self.x,
-        y: self.y,
-        width: self.w,
-        height: self.h,
-        fill: self.fill
-    });
-    this.rect = rect;
+	if (type == 'title') {
+		var rect = new Kinetic.Rect({
+			x: self.X,
+			y: self.Y,
+			width: self.W,
+			height: self.H,
+			fill: self.TITLE_FILL
+		});
+	} else {
+		var rect = new Kinetic.Rect({
+			x: self.X,
+			y: self.Y,
+			width: self.W,
+			height: self.H,
+			fill: self.FILL
+		});
+	}
+    //this.rect = rect;
+	return rect;
 };
 
 /*
@@ -55,14 +66,15 @@ Cells.prototype._rect = function() {
 Cells.prototype._key = function() {
     var self = this;
     var key = new Kinetic.Path({
-        x: self.x + 12,
-        y: self.y + 12,
+        x: self.X + 12,
+        y: self.Y + 12,
         data: 'M20,0C25,-30 -25,-30 -20,0C-20,5 -20,8 -10,15L-10,60L0,65L7,58L7,55L5,53L5,52L6,50L4,47L4,45L6,40L6,36L5,33L5,30L4,28L4,23C11,23 8,15 10,14C20,8 19,6 20,0z',
         fill: '#EB8540',
         scaleX: .2,
         scaleY: .17
     });
-    this.key = key;
+    //this.key = key;
+	return key;
 };
 
 /*
@@ -76,15 +88,16 @@ Cells.prototype._key = function() {
 Cells.prototype._text = function() {
     var self = this;
     var txt = new Kinetic.Text({
-        x: self.x + 25,
-        y: self.y + 7,
-        text: 'AttributeName',
-        fontSize: 17,
+		text: 'AttributeName',
+        x: self.X + 25,
+        y: self.Y + 7,        
+        fontSize: 16,
         fontFamily: 'Calibri',
         align: 'left',
-        fill: self.color
+        fill: self.COLOR
     });
-    this.text = txt;
+    //this.text = txt;
+	return txt;
 };
 
 /*
@@ -98,16 +111,33 @@ Cells.prototype._text = function() {
 Cells.prototype._title = function() {
     var self = this;
     var txt = new Kinetic.Text({
-        x: self.x + parseInt(self.x/2),
-        y: self.y + 7,
-        text: 'Entity name',
-        fontSize: 17,
+		text: 'Entity name',
+        x: self.X,
+        y: self.Y + parseInt(self.H/4),
+		width: self.W,        
+        fontSize: 18,
         align: 'center',
         fontStyle: 'bold',
         fontFamily: 'Calibri',
-        fill: self.color
+        fill: self.TITLE_COLOR
     });
-    this.title = txt;
+    //this.title = txt;
+	return txt;
+};
+
+Cells.prototype.drawTitle = function() {
+	var self = this;
+	var g = new Kinetic.Group({
+		x: self.X,
+		y: self.Y
+	});
+
+	var r = self._rect('title'),
+		t = self._title();
+	g.add(r)
+	 .add(t);
+
+	return g;
 };
 
 /*
@@ -131,60 +161,26 @@ Cells.prototype.setText = function(txt) {
     
 };
 
-/*
- * 
- * @returns undefined
- */
-Cells.prototype.drawTitle = function() {
-    this._rect();
-    this._title();
-    main.layer.add(this.rect);
-    main.layer.add(this.title);    
-};
-
-/*
- * 
- * @returns undefined
- */
-Cells.prototype._draw = function() {
-    this._rect();
-    this._key();
-    this._text();
-    main.layer.add(this.rect);
-    main.layer.add(this.key);
-    main.layer.add(this.text);
-};
-
-/*
- * 
- * @Name: init
- * @Param: undefined
- * @Retrun: undefined
- * @Action: init Cells object
- * 
- */
-Cells.prototype.init = function() {
-    var layer = main.layer;
-    main.stage.add(layer);
-    this._draw();
-};
-
 
 /*****************************************************************************************************************************/
 /*****************************************************************************************************************************/
 Entity = function(x, y) {
-    this.x = x;
-    this.y = y;
+    this.X = x;
+    this.Y = y;
     this.title = null;
 };
-Entity.prototype.drawTitle = function() {
-    var objTitle = new Cells(this.x, this.y);
-    objTitle.drawTitle();
-    this.title = objTitle;
-    this.title.setFill('#7195A3');
+Entity.prototype._drawTitle = function() {
+	var self = this;
+    var objTitle = new Cells(self.X, self.Y);
+	var t = objTitle.drawTitle();
+	this.title = t;
+    main.layer.add(t);
+};
+Entity.prototype.setTitle = function(txt) {
+	console.log(this.title.get('Text'));	
 };
 Entity.prototype.init = function() {
-    this.drawTitle();
+    this._drawTitle();
     var layer = main.layer;
     main.stage.add(layer);
 };

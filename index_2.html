@@ -13,6 +13,8 @@
                     height: 700
                 });
                 var layer = new Kinetic.Layer();
+                // add the layer to the stage
+                stage.add(layer);
                 var path = new Kinetic.Path({
                     x: 50,
                     y: 50,
@@ -21,12 +23,9 @@
                     fill: 'yellow',
                     scale: 2
                 });
-
-                // add the shape to the layer
+				// add the shape to the layer
                 layer.add(path);
-
-                // add the layer to the stage
-                stage.add(layer);
+                layer.draw();
             });
         </script>
     </head>
