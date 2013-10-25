@@ -1,18 +1,12 @@
 var Entity;
-Entity = function(x, y) {
-	console.log('Loaded Entity object');
-	var stage = new Kinetic.Stage({
-        container: 'mainPanel',
-        width: 1200,
-        height: 700
-    });
-    var layer = new Kinetic.Layer();
+Entity = function(layer, x, y) {
+	console.log('Create new Entity object');	
 	var group = new Kinetic.Group({
         x: 0,
         y: 0,
 		draggable: true
 	});
-    this.STAGE = stage;
+
     this.LAYER = layer;
 	this.ENTITY = group;
 	this.X = x;
@@ -27,7 +21,6 @@ Entity = function(x, y) {
 	this.LIST_ATTR = new Array();
 	
 	this.LAYER.add(this.ENTITY);
-	this.STAGE.add(this.LAYER);
 };
 
 Entity.prototype._drawTitle = function() {
@@ -123,7 +116,6 @@ Entity.prototype.addAttr = function(option) {
 Entity.prototype._draw = function() {
 	var self = this;
 	self._drawTitle();
-	self._drawAttr({name: 'attr_name', primaryKey: true});
 	this.LAYER.draw();
 };
 
