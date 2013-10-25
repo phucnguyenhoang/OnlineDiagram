@@ -20,6 +20,18 @@ Entity = function(layer, x, y) {
 	this.NUM_ATTR = 0;
 	this.LIST_ATTR = new Array();
 	
+	var border = new Kinetic.Rect({
+		x: this.X,
+		y: this.Y,
+		width: this.W,
+		height: (this.NUM_ATTR + 1)*this.H,
+		stroke: 'white',
+        strokeWidth: 4,
+		shadowColor: 'white',
+        shadowBlur: 10
+	});
+	
+	this.ENTITY.add(border);
 	this.LAYER.add(this.ENTITY);
 };
 
@@ -127,6 +139,9 @@ Entity.prototype._setEventListener = function() {
 	});
 	self.ENTITY.on('mouseout', function() {
 		body.style.cursor = 'default';
+	});
+	self.ENTITY.on('click', function() {
+		alert('ok');
 	});
 };
 
