@@ -1,4 +1,20 @@
-var Entity;
+var Entity,
+	DataType = [
+		//kieu so
+		'tinyInt', 'smallInt', 'mediumInt', 'int', 'bigInt',
+		'decimal', 'float', 'double', 'real',
+		'bit', 'boolean', 'serial',
+		//kieu ngay thang
+		'date', 'dateTime', 'timeStamp', 'time', 'year'
+		//kieu chuoi
+		'char', 'varChar',
+		'tinyText', 'text', 'mediumText', 'longText',
+		'binary', 'varBinary',
+		'tinyBlob', 'mediumBlob', 'blob', 'longBlob',
+		'enum', 'set',
+		//kieu khac
+		'geometry', 'point', 'lineString', 'polygon', 'multiPoint', 'multiLineString', 'multiPolygon', 'geometryCollection'
+	];
 Entity = function(layer, x, y) {
 	console.log('Create new Entity object');	
 	var group = new Kinetic.Group({
@@ -31,9 +47,15 @@ Entity = function(layer, x, y) {
         shadowBlur: 10
 	});
 	
-	this.ENTITY.add(border);
+	this.BORDER = border;	
+	this.ENTITY.add(this.BORDER);
 	this.LAYER.add(this.ENTITY);
 };
+
+Entity.prototype._drawBorder = function() {
+	var self = this;
+	this.BORDER.setHeight((self.NUM_ATTR + 1)*self.H)
+}
 
 Entity.prototype._drawTitle = function() {
 	var self = this;
@@ -67,12 +89,12 @@ Entity.prototype.setTitle = function(txt) {
 };
 
 Entity.prototype._drawAttr = function(option) {
-	if (typeof(option) == 'object') {
+	if (typeof(option) == 'object') {		
 		var self = this,
 			numAttr = this.NUM_ATTR,
 			o = option,
 			attr = {};
-		numAttr += 1;
+		numAttr += 1;		
 		//draw text and box
 		if (o.name && typeof(o.name) == 'string') {
 			var attrBox = new Kinetic.Rect({
@@ -113,7 +135,7 @@ Entity.prototype._drawAttr = function(option) {
 		
 		this.LIST_ATTR[numAttr] = attr;
 		this.NUM_ATTR = numAttr;
-		
+		self._drawBorder();
 	} else {
 		console.log('Param error');
 	}
