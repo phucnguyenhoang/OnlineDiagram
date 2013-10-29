@@ -8,29 +8,29 @@
         <script type="text/javascript" defer="defer" src="js/core/config.js"></script>
         <script type="text/javascript" defer="defer" src="js/core/cores.js"></script>
         <script type="text/javascript">
-            $(function(){
-				var stage = new Kinetic.Stage({
-					container: 'mainPanel',
-					width: 1200,
-					height: 700
-				});
-				var layer = new Kinetic.Layer();
-				stage.add(layer);
-				
-                /*var tbl1 = new Entity(layer, 100, 50);
+            $(function() {
+                var stage = new Kinetic.Stage({
+                    container: 'mainPanel',
+                    width: 1200,
+                    height: 700
+                });
+                var layer = new Kinetic.Layer();
+                stage.add(layer);
+
+                var tbl1 = new Entity(layer, 100, 50);
                 tbl1.init();
-				tbl1.setTitle('NhanVien');
-				tbl1.addAttr({name: 'ma_nhan_vien', primaryKey: true});
-				tbl1.addAttr({name: 'ma_phong_ban_nhan_vien', primaryKey: true});
-				tbl1.addAttr({name: 'ten_nhan_vien', type: 'int'});*/
-				
-				var tbl2 = new Entity(layer, 500, 100);
+                tbl1.setTitle('NhanVien');
+                tbl1.addAttr({name: 'ma_nhan_vien', primaryKey: true, type: 'String'});
+                tbl1.addAttr({name: 'ma_phong_ban_nhan_vien', primaryKey: true});
+                tbl1.addAttr({name: 'ten_nhan_vien', type: 'int'});
+
+                var tbl2 = new Entity(layer, 500, 100);
                 tbl2.init();
-				tbl2.setTitle('ChucVuNhanVien');
-				tbl2.addAttr({name: 'MSCV', primaryKey: true});
-				tbl2.addAttr({name: 'TenChucVuNhanVien'});
-				tbl2.addAttr({name: 'NgayNhanChuc'});
-				
+                tbl2.setTitle('ChucVuNhanVien');
+                tbl2.addAttr({name: 'MSCV', primaryKey: true, type: 'String'});
+                //tbl2.addAttr({name: 'TenChucVuNhanVien'});
+                tbl2.addAttr({name: 'NgayNhanChuc', type: 'varchar'});
+
 
             });
         </script>
