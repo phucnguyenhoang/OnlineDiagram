@@ -1,11 +1,10 @@
-var Entity,
-	DataType = [
+var DataType = [
 		//kieu so
 		'tinyInt', 'smallInt', 'mediumInt', 'int', 'bigInt',
 		'decimal', 'float', 'double', 'real',
 		'bit', 'boolean', 'serial',
 		//kieu ngay thang
-		'date', 'dateTime', 'timeStamp', 'time', 'year'
+		'date', 'dateTime', 'timeStamp', 'time', 'year',
 		//kieu chuoi
 		'char', 'varChar',
 		'tinyText', 'text', 'mediumText', 'longText',
@@ -15,27 +14,28 @@ var Entity,
 		//kieu khac
 		'geometry', 'point', 'lineString', 'polygon', 'multiPoint', 'multiLineString', 'multiPolygon', 'geometryCollection'
 	];
-Entity = function(layer, x, y) {
+ function Entity(layer, x, y) {
+	'use strict';
 	console.log('Create new Entity object');	
-	var group = new Kinetic.Group({
-        x: 0,
-        y: 0,
-		draggable: true
-	});
-
-    this.LAYER = layer;
-	this.ENTITY = group;
+	
 	this.X = x;
     this.Y = y;
     this.W = 150;
+	this.MAX_W = 150;
     this.H = 30;
     this.FILL = '#D4E7ED';
     this.COLOR = '#47423F';
 	this.TITLE_COLOR = '#FFFFFF';
 	this.TITLE_FILL = '#7195A3';
 	this.NUM_ATTR = 0;
-	this.LIST_ATTR = new Array();
+	this.LIST_ATTR = new Array();	
 	
+	var group = new Kinetic.Group({
+        x: 0,
+        y: 0,
+		draggable: true
+	});
+    
 	var border = new Kinetic.Rect({
 		x: this.X,
 		y: this.Y,
@@ -45,11 +45,13 @@ Entity = function(layer, x, y) {
         strokeWidth: 4,
 		shadowColor: 'white',
         shadowBlur: 10
-	});
+	});	
+	group.add(border);
+	layer.add(group);
 	
-	this.BORDER = border;	
-	this.ENTITY.add(this.BORDER);
-	this.LAYER.add(this.ENTITY);
+	this.BORDER = border;
+	this.ENTITY = group;
+	this.LAYER = layer;
 };
 
 Entity.prototype._drawBorder = function() {
@@ -77,14 +79,51 @@ Entity.prototype._drawTitle = function() {
         fontFamily: 'Calibri',
         fill: self.TITLE_COLOR
     });
+	
 	this.titleBox = titleBox;
 	this.titleText = titleText;
 	this.ENTITY.add(titleBox);
 	this.ENTITY.add(titleText);
 };
 
+Entity.prototype._updateBoxWidth = function() {
+	var self = this,
+		maxWidth = this.MAX_W,
+		titleWidth = parseInt(self.titleText.getWidth()),
+		numAttr = self.NUM_ATTR;
+		i = 0;
+	console.log(numAttr);
+	for (i = 1; i <= numAttr; i += 1) {
+		var textWidth = parseInt(self.LIST_ATTR[i].text.getWidth()) + 40;
+		if (textWidth > maxWidth) {
+			maxWidth = textWidth;
+		}
+	}
+	
+	if (titleWidth > maxWidth) {
+		maxWidth = titleWidth;
+	}
+	console.log(maxWidth);
+	//kiem tra max width co lon hon width hien tai
+	if (maxWidth > self.MAX_W) {
+		//maxWidth = text + key + padding right
+		//maxWidth += 40;		
+		//ve lai khung sao cho bao trum text
+		for (i = 1; i <= numAttr; i += 1) {
+			this.LIST_ATTR[i].box.setWidth(maxWidth);
+			console.log('num attr: ' + self.NUM_ATTR);
+			console.log(this.LIST_ATTR[i]);
+		}
+		this.titleBox.setWidth(maxWidth);
+		//this.titleText.setWidth(maxWidth);
+		//this.BORDER.setWidth(maxWidth);
+		this.MAX_W = maxWidth;
+	}
+};
+
 Entity.prototype.setTitle = function(txt) {
 	this.titleText.setText(txt);
+	//this._updateBoxWidth();
 	this.LAYER.draw();
 };
 
@@ -94,7 +133,8 @@ Entity.prototype._drawAttr = function(option) {
 			numAttr = this.NUM_ATTR,
 			o = option,
 			attr = {};
-		numAttr += 1;		
+		numAttr += 1;	
+		
 		//draw text and box
 		if (o.name && typeof(o.name) == 'string') {
 			var attrBox = new Kinetic.Rect({
@@ -118,6 +158,7 @@ Entity.prototype._drawAttr = function(option) {
 			this.ENTITY.add(attrBox);
 			this.ENTITY.add(attrText);
 		}
+		
 		//draw primary key
 		if (o.primaryKey && typeof(o.primaryKey) == 'boolean') {
 			var key = new Kinetic.Path({
@@ -133,17 +174,22 @@ Entity.prototype._drawAttr = function(option) {
 			this.ENTITY.add(key);
 		}
 		
+		//draw data type
+		if (o.type && typeof(o.type) == 'string') {
+			
+		}
+		
 		this.LIST_ATTR[numAttr] = attr;
-		this.NUM_ATTR = numAttr;
-		self._drawBorder();
+		this.NUM_ATTR = numAttr;		
 	} else {
 		console.log('Param error');
 	}
 };
 
 Entity.prototype.addAttr = function(option) {
-	var self = this;
-	self._drawAttr(option);
+	this._drawAttr(option);
+	this._updateBoxWidth();
+	this._drawBorder();
 	this.LAYER.draw();
 };
 
