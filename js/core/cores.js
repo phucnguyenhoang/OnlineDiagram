@@ -14,12 +14,13 @@ var DataType = [
     //kieu khac
     'geometry', 'point', 'lineString', 'polygon', 'multiPoint', 'multiLineString', 'multiPolygon', 'geometryCollection'
 ];
-function Entity(layer, x, y) {
+function Entity(layer, id, x, y) {
     'use strict';
     console.log('Create new Entity object');
 
     this.X = x;
     this.Y = y;
+    this.ID = id;
     this.W = 150;
     this.MAX_W = 150;
     this.H = 30;
@@ -33,7 +34,8 @@ function Entity(layer, x, y) {
     var group = new Kinetic.Group({
         x: 0,
         y: 0,
-        draggable: true
+        draggable: true,
+        id: this.ID
     });
 
     var border = new Kinetic.Rect({
@@ -44,7 +46,9 @@ function Entity(layer, x, y) {
         stroke: 'white',
         strokeWidth: 4,
         shadowColor: 'white',
-        shadowBlur: 10
+        shadowBlur: 10,
+        name: 'border',
+        id: 'border_' + this.ID
     });
     group.add(border);
     layer.add(group);
@@ -75,7 +79,8 @@ Entity.prototype._drawTitle = function() {
         y: self.Y,
         width: self.W,
         height: self.H,
-        fill: self.TITLE_FILL
+        fill: self.TITLE_FILL,
+        id: 'titleBox_' + self.ID
     });
     var titleText = new Kinetic.Text({
         text: 'Entity name',
@@ -86,7 +91,8 @@ Entity.prototype._drawTitle = function() {
         align: 'center',
         fontStyle: 'bold',
         fontFamily: 'Calibri',
-        fill: self.TITLE_COLOR
+        fill: self.TITLE_COLOR,
+        id: 'titleText_' + self.ID
     });
 
     this.titleBox = titleBox;
@@ -120,7 +126,6 @@ Entity.prototype._updateBoxWidth = function() {
 
     //ve lai khung sao cho bao trum text
     for (i = 1; i <= numAttr; i += 1) {
-        console.log(maxWidth + ' - ' + maxTypeWidth);
         this.LIST_ATTR[i].box.setWidth(maxWidth);
         this.LIST_ATTR[i].type.setX(self.X + maxWidth - maxTypeWidth - 10);
     }
@@ -151,7 +156,8 @@ Entity.prototype._drawAttr = function(option) {
                 y: self.Y + numAttr * (self.H),
                 width: self.W,
                 height: self.H,
-                fill: self.FILL
+                fill: self.FILL,
+                id: 'attrBox_' + self.ID
             });
             var attrText = new Kinetic.Text({
                 text: o.name,
@@ -160,7 +166,8 @@ Entity.prototype._drawAttr = function(option) {
                 fontSize: 16,
                 align: 'left',
                 fontFamily: 'Calibri',
-                fill: self.COLOR
+                fill: self.COLOR,
+                id: 'attrText_' + self.ID
             });
             attr.box = attrBox;
             attr.text = attrText;
@@ -176,7 +183,8 @@ Entity.prototype._drawAttr = function(option) {
                 data: 'M20,0C25,-30 -25,-30 -20,0C-20,5 -20,8 -10,15L-10,60L0,65L7,58L7,55L5,53L5,52L6,50L4,47L4,45L6,40L6,36L5,33L5,30L4,28L4,23C11,23 8,15 10,14C20,8 19,6 20,0z',
                 fill: '#EB8540',
                 scaleX: .2,
-                scaleY: .15
+                scaleY: .15,
+                id: 'primaryKey_' + self.ID
             });
 
             attr.primaryKey = key;
@@ -198,7 +206,8 @@ Entity.prototype._drawAttr = function(option) {
             align: 'left',
             fontFamily: 'Calibri',
             fontStyle: 'italic',
-            fill: self.COLOR
+            fill: self.COLOR,
+            id: 'attrType_' + self.ID
         });
         attr.type = attrType;
         this.ENTITY.add(attrType);
@@ -236,13 +245,18 @@ Entity.prototype._setEventListener = function() {
     self.ENTITY.on('mousedown', function() {
         this.moveToTop();
         //self.focus();
-    });   
+        self.LAYER.get('.border').each(function(shape, n) {
+            shape.setStroke('white');
+        });
+        self.focus();
+    });
 };
 
 Entity.prototype.init = function() {
     var self = this;
     self._draw();
     self._setEventListener();
+    console.log(self.ENTITY.getAbsolutePosition());   
 };
 
 

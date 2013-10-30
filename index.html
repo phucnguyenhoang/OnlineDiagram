@@ -9,6 +9,7 @@
         <script type="text/javascript" defer="defer" src="js/core/cores.js"></script>
         <script type="text/javascript">
             $(function() {
+                var root = new Array();
                 var stage = new Kinetic.Stage({
                     container: 'mainPanel',
                     width: 1200,
@@ -16,20 +17,33 @@
                 });
                 var layer = new Kinetic.Layer();
                 stage.add(layer);
+                layer.on('mouseup', function() {
+                    var mousePos = stage.getMousePosition();
+                    console.log(mousePos.x + ' - ' + mousePos.y);
+                });
+                $(document).on('mouseup', 'canvas', function(evt) {
+                    console.log(evt.pageX + ' - ' + evt.pageY);
+                });
 
-                var tbl1 = new Entity(layer, 100, 50);
-                tbl1.init();
-                tbl1.setTitle('NhanVien');
-                tbl1.addAttr({name: 'ma_nhan_vien', primaryKey: true, type: 'String'});
-                tbl1.addAttr({name: 'ma_phong_ban_nhan_vien', primaryKey: true});
-                tbl1.addAttr({name: 'ten_nhan_vien', type: 'int'});
+                root['tbl1'] = new Entity(layer, 'tbl1', 100, 50);
+                root['tbl1'].init();
+                root['tbl1'].setTitle('NhanVien');
+                root['tbl1'].addAttr({name: 'ma_nhan_vien', primaryKey: true, type: 'String'});
+                root['tbl1'].addAttr({name: 'ma_phong_ban_nhan_vien', primaryKey: true});
+                root['tbl1'].addAttr({name: 'ten_nhan_vien', type: 'int'});
 
-                var tbl2 = new Entity(layer, 500, 100);
-                tbl2.init();
-                tbl2.setTitle('ChucVuNhanVien');
-                tbl2.addAttr({name: 'MSCV', primaryKey: true, type: 'String'});
-                //tbl2.addAttr({name: 'TenChucVuNhanVien'});
-                tbl2.addAttr({name: 'NgayNhanChuc', type: 'varchar'});
+                root['tbl2'] = new Entity(layer, 'tbl2', 500, 100);
+                root['tbl2'].init();
+                root['tbl2'].setTitle('ChucVuNhanVien');
+                root['tbl2'].addAttr({name: 'MSCV', primaryKey: true, type: 'String'});
+                root['tbl2'].addAttr({name: 'TenChucVuNhanVien', type: 'String'});
+                root['tbl2'].addAttr({name: 'NgayNhanChuc', type: 'varchar'});
+                
+                root['tbl3'] = new Entity(layer, 'tbl3', 300, 300);
+                root['tbl3'].init();
+                root['tbl3'].setTitle('PhongBan');
+                root['tbl3'].addAttr({name: 'MaPhongBan', primaryKey: true, type: 'String'});
+                root['tbl3'].addAttr({name: 'TenPhongBan', type: 'String'});
 
 
             });
