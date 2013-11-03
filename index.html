@@ -7,12 +7,16 @@
         <script type="text/javascript" src="js/kinetic-v4.7.2.min.js"></script>
         <script type="text/javascript" defer="defer" src="js/core/config.js"></script>
         <script type="text/javascript" defer="defer" src="js/core/cores.js"></script>
+        <script type="text/javascript" defer="defer" src="js/core/relationship.js"></script>
         <script type="text/javascript">
             $(function() {
                 var root = new Array();
+                var currLine, entityBegin, entityEnd,
+                    endDraw = true,
+                    allowDraw = false;
                 var stage = new Kinetic.Stage({
                     container: 'mainPanel',
-                    width: 1200,
+                    width: 1300,
                     height: 700
                 });
                 var layer = new Kinetic.Layer();
@@ -32,24 +36,89 @@
                 root['tbl1'].addAttr({name: 'ma_phong_ban_nhan_vien', primaryKey: true});
                 root['tbl1'].addAttr({name: 'ten_nhan_vien', type: 'int'});
 
-                root['tbl2'] = new Entity(layer, 'tbl2', 500, 100);
+                root['tbl2'] = new Entity(layer, 'tbl2', 600, 350);
                 root['tbl2'].init();
                 root['tbl2'].setTitle('ChucVuNhanVien');
                 root['tbl2'].addAttr({name: 'MSCV', primaryKey: true, type: 'String'});
                 root['tbl2'].addAttr({name: 'TenChucVuNhanVien', type: 'String'});
                 root['tbl2'].addAttr({name: 'NgayNhanChuc', type: 'varchar'});
+                root['tbl2'].addAttr({name: 'MucLuong', type: 'Number'});
+                root['tbl2'].addAttr({name: 'PhuCap', type: 'Float'});
                 
                 root['tbl3'] = new Entity(layer, 'tbl3', 300, 300);
                 root['tbl3'].init();
                 root['tbl3'].setTitle('PhongBan');
                 root['tbl3'].addAttr({name: 'MaPhongBan', primaryKey: true, type: 'String'});
                 root['tbl3'].addAttr({name: 'TenPhongBan', type: 'String'});
+                
+                //root['tbl3'].removeEventListener();
+                
+                layer.on('mousedown', function(evt) {
+                    entityBegin = evt.targetNode.getAttr('parentId');                     
+                    var px = evt.x,
+                        py = evt.y;
+                    console.log(px + ' - ' + py);
+                    if (allowDraw && endDraw) {
+                        endDraw = false;
+                        currLine = new LineJoint(layer, px, py);
+                        currLine.entityBegin = root[entityBegin];
+                    }
+                });
+                
+                $(document).on('mousemove', 'canvas', function(e) {
+                    var px = e.pageX,
+                        py = e.pageY;
+                    if (typeof(currLine) != undefined && allowDraw && !endDraw) {
+                        console.log(px, py);
+                        currLine.update(px, py);
+                    }
+                });
+                
+                layer.on('mouseup', function(e) {
+                    entityEnd = e.targetNode.getAttr('parentId');
 
-
+                    if (typeof(currLine) != undefined && allowDraw && !endDraw) {
+                        currLine.entityEnd = root[entityEnd];
+                        currLine.joint();
+                        currLine.setEventListener();
+                        root[entityBegin].relationship.push(currLine);
+                        root[entityEnd].relationship.push(currLine);
+                        allowDraw = false;
+                        endDraw = true;
+                        currLine = undefined;
+                        $('#chkRelationship').prop('checked', false);
+                        setListener();
+                    }					
+                });
+                
+                $('#chkRelationship').change(function () {
+                    if ($(this).prop('checked')) {
+                        allowDraw = true;
+                        removeListener();
+                    } else {
+                        allowDraw = false;
+                        setListener();
+                    }
+                });
+                
+                function setListener() {
+                    for (var obj in root) {
+                        root[obj].setEventListener();
+                    }
+                }
+                function removeListener() {
+                    for (var obj in root) {                      
+                        root[obj].removeEventListener();
+                    }
+                }
             });
         </script>
     </head>
     <body>
         <div id="mainPanel"></div>
+        <div id="controlPanel">
+            <!-- <input type="checkbox" name="control" id="chkEntity"> <label for="chkEntity">Entity</label> -->
+            <input type="checkbox" name="control" id="chkRelationship"> <label for="chkRelationship">Relationship</label>
+        </div>
     </body>
 </html>

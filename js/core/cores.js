@@ -20,6 +20,8 @@ function Entity(layer, id, x, y) {
 
     this.X = x;
     this.Y = y;
+    this.newX = x;
+    this.newY = y;
     this.ID = id;
     this.W = 150;
     this.MAX_W = 150;
@@ -30,6 +32,7 @@ function Entity(layer, id, x, y) {
     this.TITLE_FILL = '#7195A3';
     this.NUM_ATTR = 0;
     this.LIST_ATTR = new Array();
+    this.relationship = new Array();
 
     var group = new Kinetic.Group({
         x: 0,
@@ -48,7 +51,7 @@ function Entity(layer, id, x, y) {
         shadowColor: 'white',
         shadowBlur: 10,
         name: 'border',
-        id: 'border_' + this.ID
+        parentId: this.ID
     });
     group.add(border);
     layer.add(group);
@@ -80,7 +83,7 @@ Entity.prototype._drawTitle = function() {
         width: self.W,
         height: self.H,
         fill: self.TITLE_FILL,
-        id: 'titleBox_' + self.ID
+        parentId: self.ID
     });
     var titleText = new Kinetic.Text({
         text: 'Entity name',
@@ -92,7 +95,7 @@ Entity.prototype._drawTitle = function() {
         fontStyle: 'bold',
         fontFamily: 'Calibri',
         fill: self.TITLE_COLOR,
-        id: 'titleText_' + self.ID
+        parentId: self.ID
     });
 
     this.titleBox = titleBox;
@@ -157,7 +160,7 @@ Entity.prototype._drawAttr = function(option) {
                 width: self.W,
                 height: self.H,
                 fill: self.FILL,
-                id: 'attrBox_' + self.ID
+                parentId: self.ID
             });
             var attrText = new Kinetic.Text({
                 text: o.name,
@@ -167,7 +170,7 @@ Entity.prototype._drawAttr = function(option) {
                 align: 'left',
                 fontFamily: 'Calibri',
                 fill: self.COLOR,
-                id: 'attrText_' + self.ID
+                parentId: self.ID
             });
             attr.box = attrBox;
             attr.text = attrText;
@@ -184,7 +187,7 @@ Entity.prototype._drawAttr = function(option) {
                 fill: '#EB8540',
                 scaleX: .2,
                 scaleY: .15,
-                id: 'primaryKey_' + self.ID
+                parentId: self.ID
             });
 
             attr.primaryKey = key;
@@ -207,7 +210,7 @@ Entity.prototype._drawAttr = function(option) {
             fontFamily: 'Calibri',
             fontStyle: 'italic',
             fill: self.COLOR,
-            id: 'attrType_' + self.ID
+            parentId: self.ID
         });
         attr.type = attrType;
         this.ENTITY.add(attrType);
@@ -233,7 +236,37 @@ Entity.prototype._draw = function() {
     this.LAYER.draw();
 };
 
-Entity.prototype._setEventListener = function() {
+Entity.prototype.getWidth = function() {
+    return this.MAX_W;
+};
+
+Entity.prototype.getHeight = function() {
+    var self = this;   
+    return (self.NUM_ATTR + 1) * self.H;
+};
+
+Entity.prototype.setPosition = function(x, y) {
+    console.log('x: ' + x + '- y: ' + y);
+    var self = this;
+    var objX = self.X,
+        objY = self.Y;
+    console.log('objx: ' + objX + '- objy: ' + objY);
+    if (x - objX >= 0) {
+        x = x - objX;
+    } else {
+        x = objX - x;
+    }
+    if (y - objY >= 0) {
+        y = y - objY;
+    } else {
+        y = objY - y;
+    }
+    console.log('x: ' + x + '- y: ' + y);
+    this.ENTITY.move(x, y);    
+    this.LAYER.draw();
+};
+
+Entity.prototype.setEventListener = function() {
     var self = this,
         body = document.body;
     self.ENTITY.on('mouseover', function() {
@@ -250,13 +283,44 @@ Entity.prototype._setEventListener = function() {
         });
         self.focus();
     });
+    self.ENTITY.on('dragmove', function(e) {
+        var boxX = parseInt(this.getX()),
+            boxY = parseInt(this.getY()),
+            x = self.X,
+            y = self.Y,
+            x1, x2, y1, y2;
+        self.newX = x + boxX;
+        self.newY = y + boxY;       
+        
+        var numRelationship = self.relationship.length - 1,
+            i = 0;
+        for (i = 0; i <= numRelationship; i += 1) {
+            if (typeof(self.relationship[i]) == 'object') {
+                var r = self.relationship[i].lines;
+                var numLine = self.relationship[i].lines.length - 1;
+                x1 = self.newX + self.getWidth();
+                y1 = self.newY + parseInt(self.getHeight()/2);
+                r[0].setPoints([x1, y1, r[0].getAttrs().points[1].x, y1]);
+                r[numLine].setPoints([r[numLine].getAttrs().points[0].x, y1, r[numLine].getAttrs().points[1].x, r[numLine].getAttrs().points[1].y]);
+            }
+        }        
+    });
+    self.ENTITY.setAttr('draggable', true);
+};
+
+Entity.prototype.removeEventListener = function() {
+    var self = this;
+    self.ENTITY.off('mouseover');
+    self.ENTITY.off('mouseout');
+    //self.ENTITY.off('mousedown');
+    self.ENTITY.setAttr('draggable', false);
 };
 
 Entity.prototype.init = function() {
     var self = this;
     self._draw();
-    self._setEventListener();
-    console.log(self.ENTITY.getAbsolutePosition());   
+    self.setEventListener();
+    //console.log(self.ENTITY.getAbsolutePosition());   
 };
 
 

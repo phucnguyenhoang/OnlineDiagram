@@ -8,3 +8,9 @@ canvas{
     top: 0px;
     left: 0px;
 }
+#controlPanel{
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    color: white;
+}
