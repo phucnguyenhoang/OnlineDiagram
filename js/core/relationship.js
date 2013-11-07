@@ -38,53 +38,79 @@ LineJoint.prototype.update = function(x, y) {
 LineJoint.prototype._layGiaoX = function() {
     var entityBegin = this.entityBegin,
         entityEnd = this.entityEnd;
-    var beginX = entityBegin.newX,
-        endX = entityEnd.newX,
+    var beginX1 = entityBegin.newX,
+        beginY1 = entityBegin.newY,
+        endX1 = entityEnd.newX,
+        endY1 = entityEnd.newY,
         beginW = entityBegin.getWidth(),
-        endW = entityEnd.getWidth();
-
-    if (beginX <= endX && beginX + beginW >= endX + endW) {
-        return endW;
-    } else if (beginX <= endX && beginX + beginW >= endX + endW) {
-        return beginW;
-    } else if (beginX < endX && beginX + beginW <= endX + endW) {
-        if (beginX + beginW - endX > 0) {
-            return (beginX + beginW - endX);
-        }
-        return 0;
-    } else {
-        if (endX + endW - beginX > 0) {
-            return (endX + endW - beginX);
-        }
-        return 0;
-    }
-    return 0;
-};
-
-LineJoint.prototype._layGiaoY = function() {
-    var entityBegin = this.entityBegin,
-        entityEnd = this.entityEnd;
-    var beginY = entityBegin.newY,
-        endY = entityEnd.newY,
         beginH = entityBegin.getHeight(),
+        endW = entityEnd.getWidth(),
         endH = entityEnd.getHeight();
+    var beginX2 = beginX1 + beginW,
+        beginY2 = beginY1 + beginH,
+        endX2 = endX1 + endW,
+        endY2 = endY1 + endH;
 
-    if (beginY <= endY && beginY + beginH >= endY + endH) {
-        return endH;
-    } else if (beginY <= endY && beginY + beginH >= endY + endH) {
-        return beginH;
-    } else if (beginY < endY && beginY + beginH <= endY + endH) {
-        if (beginY + beginH - endY > 0) {
-            return (beginY + beginH - endY);
-        }
-        return 0;
-    } else {
-        if (endY + endH - beginY > 0) {
-            return (endY + endH - beginY);
-        }
-        return 0;
-    }
-    return 0;
+   //truong hop 1
+   //bang 1 nam trong bang 2 hoac bang 2 nam trong bang 1
+   if (
+           //neu bang 2 nam trong bang 1
+           (endX1 >= beginX1 && endY1 >= beginY1 && endX2 <= beginX2 && endY2 <= beginY2)
+           ||
+           //new bang 1 nam trong bang 2
+           (beginX1 >= endX1 && beginY1 >= endY1 && beginX2 <= endX2 && beginY2 <= endY2)
+      ) {
+       return 1;
+   }
+   //truong hop 2
+   //bang 2 nam tren ben trai bang mot hoac nguoc lai
+   if (
+           //neu bang 2 lon bang 1
+           (endX1 < beginX1 && endY1 > beginY1 && endX2 <= beginX2 && endY2 < beginY2)
+           ||
+           //nguoc lai
+           (beginX1 < endX1 && beginY1 < endY1 && beginX2 <= endX2 && beginY2 > endY2)
+       ) {
+       return 2;
+   }
+   //truong hop 3
+   //bang 2 nam tren goc tren ben trai bang mot hoac nguoc lai
+   if (endX1 < beginX1 && endY1 < beginY1 && endX2 < beginX2 && endY2 < beginY2 && endX2 > beginX1 && endY2 > beginY1) {
+       return 3;
+   }
+   //truong hop 4
+   //bang 2 nam tren bang mot hoac nguoc lai
+   if (
+           //neu bang 2 nam tren bang 1
+           (endX1 >= beginX1 && endY1 < beginY1 && endX2 <= beginX2 && endY2 <= beginY2 && endX2 >= beginX1 && endY2 >= beginY1)
+           ||
+           //nguoc lai
+           (beginX1 >= endX1 && beginY1 < endY1 && beginX2 <= endX2 && beginY2 <= endY2)
+       ) {
+       return 4;
+   }
+   //truong hop 5
+   //bang 2 nam goc tren ben phai bang mot hoac nguoc lai
+   if (
+           //neu bang 2 nam tren bang 1
+           (endX1 > beginX1 && endY1 > beginY1 && endX2 > beginX2 && endY2 <= beginY2)
+           ||
+           //nguoc lai
+           (beginX1 > endX1 && beginY1 > endY1 && beginX2 > endX2 && beginY2 <= endY2)
+       ) {
+       return 5;
+   }
+   //truong hop 6
+   //bang 2 nam tren ben phai bang mot hoac nguoc lai
+   if (
+           //neu bang 2 nam tren bang 1
+           (endX1 >= beginX1 && endY1 < beginY1 && endX2 <= beginX2 && endY2 <= beginY2)
+           ||
+           //nguoc lai
+           (beginX1 >= endX1 && beginY1 < endY1 && beginX2 <= endX2 && beginY2 <= endY2)
+       ) {
+       return 4;
+   }
 };
 
 LineJoint.prototype.joint = function() {
@@ -99,114 +125,7 @@ LineJoint.prototype.joint = function() {
         beginH = entityBegin.getHeight(),
         endW = entityEnd.getWidth(),
         endH = entityEnd.getHeight();
-    //bang 2 nam ben phai ngang bang 1
-    var giaoY = self._layGiaoY(),
-        giaoX = self._layGiaoX();
-    if (giaoY >= 40) {
-        var x1, x2, y1, y2;
-        
-        if (endX > beginX) {
-            x1 = beginX + beginW;
-            x2 = endX;
-        } else {
-            x1 = beginX;
-            x2 = endX + endW;
-        }
-        
-        if (giaoY === beginH) {
-            y1 = y2 = beginY + parseInt(beginH/2);
-        } else if (giaoY === endH) {
-            y1 = y2 = endY + parseInt(endH/2);
-        } else if ((beginY + parseInt(giaoY/2)) > endY && (beginY + parseInt(giaoY/2)) < (endY + endH)) {
-            y1 = y2 = beginY + parseInt(giaoY/2);
-        } else{
-            y1 = y2 = beginY + beginH - parseInt(giaoY/2);
-        }
-        
-        var l = new Kinetic.Line({
-            points: [x1, y1, x2, y2],
-            stroke: 'blue',
-            strokeWidth: 2,
-            lineCap: 'round',
-            draggable: true
-        });       
-        this.lines.push(l);
-        this.LAYER.add(l);
-        l.moveToBottom();
-        this.line.destroy();
-        this.LAYER.draw();
-    } else if (giaoX >= 50) {
-        var x1, x2, y1, y2;
-        
-        if (endY > beginY) {
-            y1 = beginY + beginH;
-            y2 = endY;
-        } else {
-            y1 = beginY;
-            y2 = endY + endH;
-        }
-        
-        if (giaoX === beginW) {
-            x1 = x2 = beginX + parseInt(beginW/2);
-        } else if (giaoX === endW) {
-            x1 = x2 = endX + parseInt(endW/2);
-        } else if ((beginX + parseInt(giaoX/2)) > endX && (beginX + parseInt(giaoX/2)) < (endX + endW)) {
-            x1 = x2 = beginX + parseInt(giaoX/2);
-        } else{
-            x1 = x2 = beginX + beginW - parseInt(giaoX/2);
-        }
-        
-        var l = new Kinetic.Line({
-            points: [x1, y1, x2, y2],
-            stroke: 'blue',
-            strokeWidth: 2,
-            lineCap: 'round',
-            draggable: true
-        });       
-        this.lines.push(l);
-        this.LAYER.add(l);
-        l.moveToBottom();
-        this.line.destroy();
-        this.LAYER.draw();
-    } else if (giaoY < 40) {
-        var x1, x2, y1, y2;       
-        if (endX >= beginX + beginW) {
-            x1 = beginX + beginW;
-        } else {
-            x1 = beginX;
-        }
-        y1 = beginY + parseInt(beginH/2);
-        x2 = endX + parseInt(endW/2);
-        y2 = beginY + parseInt(beginH/2);
-        var l1 = new Kinetic.Line({
-            points: [x1, y1, x2, y2],
-            stroke: 'blue',
-            strokeWidth: 2,
-            lineCap: 'round',
-            draggable: true
-        });
-        x1 = endX + parseInt(endW/2);
-        y1 = beginY + parseInt(beginH/2);
-        x2 = endX + parseInt(endW/2);
-        if (endY > beginY) {
-            y2 = endY;
-        } else {
-            y2 = endY + endH;
-        }  
-        var l2 = new Kinetic.Line({
-            points: [x1, y1, x2, y2],
-            stroke: 'blue',
-            strokeWidth: 2,
-            lineCap: 'round',
-            draggable: true
-        });
-        this.lines.push(l1, l2);
-        this.LAYER.add(l1).add(l2);
-        l1.moveToBottom();
-        l2.moveToBottom();
-        this.line.destroy();
-        this.LAYER.draw();       
-    }
+    
 };
 
 LineJoint.prototype.setEventListener = function() {
