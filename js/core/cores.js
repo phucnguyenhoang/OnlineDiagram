@@ -245,25 +245,20 @@ Entity.prototype.getHeight = function() {
     return (self.NUM_ATTR + 1) * self.H;
 };
 
-Entity.prototype.setPosition = function(x, y) {
-    console.log('x: ' + x + '- y: ' + y);
-    var self = this;
-    var objX = self.X,
-        objY = self.Y;
-    console.log('objx: ' + objX + '- objy: ' + objY);
-    if (x - objX >= 0) {
-        x = x - objX;
-    } else {
-        x = objX - x;
+Entity.prototype.updatePosition = function(x, y) {
+    if (!x && !y) {
+        console.log('Missing param in updatePosition function');
+        return;
     }
-    if (y - objY >= 0) {
-        y = y - objY;
-    } else {
-        y = objY - y;
-    }
-    console.log('x: ' + x + '- y: ' + y);
+    var self        = this;
+    x = !x ? 0 : x;
+    y = !y ? 0 : y;      
     this.ENTITY.move(x, y);    
     this.LAYER.draw();
+    var objX        = parseInt(self.ENTITY.getAbsolutePosition().x),
+        objY        = parseInt(self.ENTITY.getAbsolutePosition().y);
+    this.newX = self.X + objX;
+    this.newY = self.Y + objY;
 };
 
 Entity.prototype.setEventListener = function() {

@@ -1,163 +1,165 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<style>
-			body{
-				margin: 0px;
-				padding: 0px;
-			}
-			canvas{
-				position: absolute;
-				top: 0px;
-				left: 0px;
-				/*border: 1px solid #CCC !important;*/
-			}
-			#input{
-				position: absolute;
-				top: 20px;
-				left: 50px;
-			}
-		</style>
-		<script src="js/jquery.js"></script>
-		<script src="js/kinetic-v4.7.2.min.js"></script>
-		<script type="text/javascript">
-			$(function() {
+    <head>
+        <style>
+            body{
+                margin: 0px;
+                padding: 0px;
+            }
+            canvas{
+                position: absolute;
+                top: 0px;
+                left: 0px;
+                /*border: 1px solid #CCC !important;*/
+            }
+            #input{
+                position: absolute;
+                top: 20px;
+                left: 50px;
+            }
+        </style>
+        <script src="js/jquery.js"></script>
+        <script src="js/kinetic-v4.7.2.min.js"></script>
+        <script type="text/javascript">
+            $(function() {
 
-				var stage = new Kinetic.Stage({
-					container: 'container',
-					width: 1200,
-					height: 700
-				});
-				var layer = new Kinetic.Layer();
-				stage.add(layer);
-				function LineJoint(x, y) {
-					this.beginX = x;
-					this.beginY = y;
-					this.endX = x;
-					this.endY = y;
-					this.lines = new Array();
-					this.numLine = 0;
-					var blueLine = new Kinetic.Line({
-						points: [x, y, x, y],
-						stroke: 'blue',
-						strokeWidth: 5,
-						lineCap: 'round'
-					});
-					this.line = blueLine;
-					layer.add(blueLine);
-					layer.draw();
-				}
-				LineJoint.prototype.update = function(x, y) {
-					this.endX = x;
-					this.endY = y;
-					this.line.setPoints([this.beginX, this.beginY, x, y]);
-					layer.draw();
-				};
-				
-				LineJoint.prototype.autoAddLine = function(x, y) {
-					if (x>this.beginX && y>this.beginY) {
-						var l1 = new Kinetic.Line({
-							points: [this.beginX, this.beginY, x, this.beginY],
-							stroke: 'blue',
-							strokeWidth: 5,
-							lineCap: 'round'
-						});
-						var l2 = new Kinetic.Line({
-							points: [x, this.beginY, x, y],
-							stroke: 'blue',
-							strokeWidth: 5,
-							lineCap: 'round'
-						});
-						this.lines.push(l1, l2);						
-						layer.add(l1).add(l2);
-						this.line.destroy();
-						layer.draw();
-					}
-				};
-				
-				LineJoint.prototype.setEventListener = function() {
-					var numLine = this.lines.length,
-						l = this.lines,
-						i = 0,
-						beginX, beginY, endX, endY;
-					//console.log(l[0].getAttrs().points[0].x);
-					for (i = 0; i<numLine; i += 1) {
-						beginX = l[i].getAttrs().points[0].x;
-						beginY = l[i].getAttrs().points[0].y;
-						endX = l[i].getAttrs().points[1].x;
-						endY = l[i].getAttrs().points[1].y;
-						if (beginX == endX) {
-							this.lines[i].on('mouseover', function() {
-								document.body.style.cursor = 'e-resize';
-							});
-							this.lines[i].on('mouseout', function() {
-								document.body.style.cursor = 'default';
-							});
-						}
-						if (beginY == endY) {
-							this.lines[i].on('mouseover', function() {
-								document.body.style.cursor = 'n-resize';
-							});
-							this.lines[i].on('mouseout', function() {
-								document.body.style.cursor = 'default';
-							});
-						}
-					}
-				};
-				
-				var currLine,
-					endDraw = true,
-					allowDraw = false;
-					
-				$('#chkDraw').change(function () {
-					if ($(this).prop('checked')) {
-						allowDraw = true;
-						console.log($(this).prop('checked'));
-					} else {
-						allowDraw = false;
-						console.log($(this).prop('checked'));
-					}
-				});
-				$(document).on('mousedown', 'canvas', function(e) {
-					var px = e.pageX,
-						py = e.pageY;
-					console.log(px + ' - ' + py);
-					if (allowDraw && endDraw) {
-						endDraw = false;
-						currLine = new LineJoint(px, py);
-					}					
-				});
-				
-				$(document).on('mousemove', 'canvas', function(e) {
-					var px = e.pageX,
-						py = e.pageY;
-					if (typeof(currLine) != undefined && allowDraw && !endDraw) {
-						console.log(px, py);
-						currLine.update(px, py);
-					}
-				});
-				
-				$(document).on('mouseup', 'canvas', function(e) {
-					var px = e.pageX,
-						py = e.pageY;
-						
-					if (typeof(currLine) != undefined && allowDraw && !endDraw) {
-						currLine.autoAddLine(px, py);
-						currLine.setEventListener();
-						allowDraw = false;
-						endDraw = true;
-						currLine = undefined;
-						$('#chkDraw').prop('checked', false);
-					}					
-				});
-			});
-		</script>
-	</head>
-	<body>
-	<div id="container"></div>
-	<div id="input">
-		<input type="checkbox" id="chkDraw">Draw
-	</div>
-	
-	</body>
+                var stage = new Kinetic.Stage({
+                    container: 'container',
+                    width: 1200,
+                    height: 700
+                });
+                var layer = new Kinetic.Layer();
+                stage.add(layer);
+                function LineJoint(layer, x, y) {
+                    this.beginX = x;
+                    this.beginY = y;
+                    this.endX = x;
+                    this.endY = y;
+                    this.lines = new Array();
+                    this.numLine = 0;
+                    var blueLine = new Kinetic.Line({
+                        points: [x, y, x, y],
+                        stroke: 'blue',
+                        strokeWidth: 5,
+                        lineCap: 'round'
+                    });
+                    //this.line = blueLine;
+                    this.lines.push(blueLine);
+                    this.layer = layer;
+                    this.layer.add(blueLine);
+                    this.layer.draw();
+                }
+                LineJoint.prototype.update = function(x, y) {
+                    this.endX = x;
+                    this.endY = y;
+                    this.lines[0].setPoints([this.beginX, this.beginY, x, y]);
+                    this.layer.draw();
+                };
+
+                LineJoint.prototype.autoAddLine = function(x, y) {
+                    /*if (x > this.beginX && y > this.beginY) {
+                        var l1 = new Kinetic.Line({
+                            points: [this.beginX, this.beginY, x, this.beginY],
+                            stroke: 'blue',
+                            strokeWidth: 5,
+                            lineCap: 'round'
+                        });
+                        var l2 = new Kinetic.Line({
+                            points: [x, this.beginY, x, y],
+                            stroke: 'blue',
+                            strokeWidth: 5,
+                            lineCap: 'round'
+                        });
+                        this.lines.push(l1, l2);
+                        this.layer.add(l1).add(l2);
+                        this.lines[0].destroy();
+                        this.layer.draw();
+                    }*/
+                };
+
+                LineJoint.prototype.setEventListener = function() {
+                    var numLine = this.lines.length,
+                            l = this.lines,
+                            i = 0,
+                            beginX, beginY, endX, endY;
+                    //console.log(l[0].getAttrs().points[0].x);
+                    for (i = 0; i < numLine; i += 1) {
+                        beginX = l[i].getAttrs().points[0].x;
+                        beginY = l[i].getAttrs().points[0].y;
+                        endX = l[i].getAttrs().points[1].x;
+                        endY = l[i].getAttrs().points[1].y;
+                        if (beginX == endX) {
+                            this.lines[i].on('mouseover', function() {
+                                document.body.style.cursor = 'e-resize';
+                            });
+                            this.lines[i].on('mouseout', function() {
+                                document.body.style.cursor = 'default';
+                            });
+                        }
+                        if (beginY == endY) {
+                            this.lines[i].on('mouseover', function() {
+                                document.body.style.cursor = 'n-resize';
+                            });
+                            this.lines[i].on('mouseout', function() {
+                                document.body.style.cursor = 'default';
+                            });
+                        }
+                    }
+                };
+
+                var currLine,
+                        endDraw = true,
+                        allowDraw = false;
+
+                $('#chkDraw').change(function() {
+                    if ($(this).prop('checked')) {
+                        allowDraw = true;
+                        console.log($(this).prop('checked'));
+                    } else {
+                        allowDraw = false;
+                        console.log($(this).prop('checked'));
+                    }
+                });
+                $(document).on('mousedown', 'canvas', function(e) {
+                    var px = e.pageX,
+                            py = e.pageY;
+                    console.log(px + ' - ' + py);
+                    if (allowDraw && endDraw) {
+                        endDraw = false;
+                        currLine = new LineJoint(layer, px, py);
+                    }
+                });
+
+                $(document).on('mousemove', 'canvas', function(e) {
+                    var px = e.pageX,
+                            py = e.pageY;
+                    if (typeof(currLine) != undefined && allowDraw && !endDraw) {
+                        console.log(px, py);
+                        currLine.update(px, py);
+                    }
+                });
+
+                $(document).on('mouseup', 'canvas', function(e) {
+                    var px = e.pageX,
+                            py = e.pageY;
+
+                    if (typeof(currLine) != undefined && allowDraw && !endDraw) {
+                        currLine.autoAddLine(px, py);
+                        currLine.setEventListener();
+                        allowDraw = false;
+                        endDraw = true;
+                        currLine = undefined;
+                        $('#chkDraw').prop('checked', false);
+                    }
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="container"></div>
+        <div id="input">
+            <input type="checkbox" id="chkDraw">Draw
+        </div>
+
+    </body>
 </html>
